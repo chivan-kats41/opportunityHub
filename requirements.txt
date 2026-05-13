@@ -7,3 +7,4 @@ Pillow==11.1.0
 stripe==9.12.0
 requests==2.32.3
 pymysql==1.1.1
+django-honeypot==1.2.1
