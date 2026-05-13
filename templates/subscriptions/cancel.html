@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Subscription — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:480px;margin:3rem auto;padding:0 2rem;">
+  <div class="sidebar-card text-center">
+    <div style="width:64px;height:64px;background:#FFF3E0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+      <i class="bi bi-exclamation-triangle-fill" style="font-size:1.8rem;color:#E65100;"></i>
+    </div>
+    <h4 style="font-family:'Playfair Display',serif;margin-bottom:.5rem;">Cancel Subscription?</h4>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;">
+      You'll lose access to your <strong>{{ subscription.plan.name }}</strong> benefits at the end of the billing period.
+    </p>
+    <form method="post" class="d-flex gap-3 justify-content-center">
+      {% csrf_token %}
+      <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary px-4">Keep Plan</a>
+      <button type="submit" class="btn btn-danger px-4">Cancel Anyway</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

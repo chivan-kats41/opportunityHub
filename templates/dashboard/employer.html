@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Employer Dashboard — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:1200px;margin:3rem auto;padding:0 2rem;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;margin:0;">Welcome back, {{ user.first_name }}!</h2>
+      <p style="color:var(--text-muted);margin:0;">{{ user.company_name|default:"Your Company" }} — Employer Dashboard</p>
+    </div>
+    <a href="{% url 'jobs:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Post New Job</a>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:var(--blue);">{{ total_jobs }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Total Jobs Posted</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:#1A7A4A;">{{ active_jobs }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Active Listings</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:var(--accent);">{{ total_applications }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Total Applications</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:#6B21A8;">
+          {% if user_plan %}{{ user_plan.name }}{% else %}Free{% endif %}
+        </div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Current Plan</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Recent Applications -->
+    <div class="col-lg-8">
+      <div class="sidebar-card p-0">
+        <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+          <h6 style="margin:0;font-weight:600;">Recent Applications</h6>
+          <a href="{% url 'jobs:my_jobs' %}" style="font-size:.8rem;color:var(--blue);">View all jobs →</a>
+        </div>
+        {% if recent_applications %}
+        <table class="table table-hover mb-0">
+          <thead style="background:var(--surface);">
+            <tr>
+              <th class="ps-4 py-2">Applicant</th>
+              <th>Job</th>
+              <th>Applied</th>
+              <th class="pe-4">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in recent_applications %}
+            <tr>
+              <td class="ps-4">
+                <div style="font-weight:500;font-size:.875rem;">{{ app.applicant.get_full_name|default:app.applicant.username }}</div>
+              </td>
+              <td style="font-size:.875rem;color:var(--text-muted);">{{ app.job.title|truncatechars:30 }}</td>
+              <td style="font-size:.8rem;color:var(--text-muted);">{{ app.applied_at|timesince }} ago</td>
+              <td class="pe-4"><span class="badge {{ app.get_status_badge_class }}">{{ app.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="bi bi-inbox" style="font-size:2rem;color:var(--text-muted);"></i>
+          <p class="text-muted mt-2 mb-0">No applications yet</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick links + recent jobs -->
+    <div class="col-lg-4">
+      <div class="sidebar-card mb-4">
+        <p class="sidebar-title">Quick Actions</p>
+        <div class="d-grid gap-2">
+          <a href="{% url 'jobs:create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-2"></i>Post New Job</a>
+          <a href="{% url 'jobs:my_jobs' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-briefcase me-2"></i>My Job Listings</a>
+          <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-person me-2"></i>Edit Profile</a>
+          <a href="{% url 'subscriptions:pricing' %}" class="btn btn-outline-warning btn-sm"><i class="bi bi-star me-2"></i>Upgrade Plan</a>
+        </div>
+      </div>
+
+      <div class="sidebar-card p-0">
+        <div class="px-4 py-3 border-bottom">
+          <h6 style="margin:0;font-weight:600;">My Recent Jobs</h6>
+        </div>
+        {% for job in jobs %}
+        <div class="px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+          <div>
+            <div style="font-weight:500;font-size:.875rem;">{{ job.title|truncatechars:28 }}</div>
+            <div style="font-size:.75rem;color:var(--text-muted);">{{ job.application_count }} applicant{{ job.application_count|pluralize }}</div>
+          </div>
+          {% if job.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Off</span>{% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-4"><p class="text-muted mb-0" style="font-size:.875rem;">No jobs yet</p></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

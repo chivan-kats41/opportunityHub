@@ -1,0 +1,281 @@
+# JobHub — Job Opportunity Hub
+
+A full-featured job board web application built with Django 4.x, Bootstrap 5, and MySQL.
+
+---
+
+## Tech Stack
+
+| Layer      | Technology                                  |
+|------------|---------------------------------------------|
+| Frontend   | Bootstrap 5, HTML5, CSS3, DM Sans / Playfair Display |
+| Backend    | Django 4.2 (Python 3.10+)                  |
+| Database   | MySQL 8.x                                   |
+| Forms      | django-crispy-forms + crispy-bootstrap5     |
+| Auth       | Django built-in + custom AbstractUser       |
+| File storage | Local (Pillow for images, PDF for resumes) |
+
+---
+
+## Features
+
+- **Role-based auth** — Job Seeker & Employer roles with separate registration flows
+- **Job listings** — Post, edit, delete, feature jobs with categories & filters
+- **Applications** — Apply with cover letter + PDF resume upload; track status
+- **Dashboards** — Separate employer & jobseeker dashboards with stats
+- **Subscriptions** — Free / Pro / Elite (jobseeker) and Starter / Growth / Enterprise (employer) plans
+- **Search & filter** — Keyword, location, job type, category
+- **Admin panel** — Django admin for full moderation
+
+---
+
+## Setup Instructions
+
+### 1. Clone & create virtual environment
+
+```bash
+git clone <your-repo-url>
+cd jobbhub
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your values:
+
+```env
+SECRET_KEY=your-very-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+DB_NAME=jobbhub_db
+DB_USER=jobbhub_user
+DB_PASSWORD=your_db_password
+DB_HOST=localhost
+DB_PORT=3306
+```
+
+### 4. Set up MySQL database
+
+```sql
+CREATE DATABASE jobbhub_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'jobbhub_user'@'localhost' IDENTIFIED BY 'your_db_password';
+GRANT ALL PRIVILEGES ON jobbhub_db.* TO 'jobbhub_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### 5. Run migrations
+
+```bash
+python manage.py makemigrations accounts
+python manage.py makemigrations jobs
+python manage.py makemigrations applications
+python manage.py makemigrations subscriptions
+python manage.py migrate
+```
+
+### 6. Load initial data fixtures
+
+```bash
+python manage.py loaddata fixtures/categories.json
+python manage.py loaddata fixtures/plans.json
+```
+
+### 7. Create superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+### 8. Collect static files (production)
+
+```bash
+python manage.py collectstatic
+```
+
+### 9. Run development server
+
+```bash
+python manage.py runserver
+```
+
+Visit **http://127.0.0.1:8000/** to see the app.
+
+---
+
+## URL Structure
+
+| URL | Description |
+|-----|-------------|
+| `/` | Homepage with featured jobs + pricing |
+| `/jobs/` | All job listings (paginated, filterable) |
+| `/jobs/<id>/` | Job detail |
+| `/jobs/create/` | Post a job (employer only) |
+| `/jobs/<id>/edit/` | Edit job (employer only) |
+| `/jobs/<id>/delete/` | Delete job |
+| `/jobs/my-jobs/` | Employer's job list |
+| `/accounts/register/` | Registration (jobseeker/employer) |
+| `/accounts/login/` | Login |
+| `/accounts/profile/` | Edit profile |
+| `/applications/apply/<job_id>/` | Apply for job |
+| `/applications/my/` | My applications (jobseeker) |
+| `/applications/job/<job_id>/applicants/` | View applicants (employer) |
+| `/dashboard/` | Role-based dashboard redirect |
+| `/dashboard/employer/` | Employer dashboard |
+| `/dashboard/jobseeker/` | Jobseeker dashboard |
+| `/subscriptions/pricing/` | Pricing page |
+| `/subscriptions/checkout/<plan>/` | Subscribe to plan |
+| `/admin/` | Django admin panel |
+
+---
+
+## Project Structure
+
+```
+jobbhub/
+├── jobbhub/              # Django project config
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── accounts/             # Auth, profiles, dashboards
+│   ├── models.py         # CustomUser (role field)
+│   ├── views.py          # register, login, profile, dashboards
+│   ├── forms.py          # JobseekerForm, EmployerForm, ProfileForm
+│   ├── decorators.py     # @employer_required, @jobseeker_required
+│   ├── urls.py
+│   └── dashboard_urls.py
+├── jobs/                 # Job listings
+│   ├── models.py         # Category, Job
+│   ├── views.py
+│   └── forms.py
+├── applications/         # Job applications
+│   ├── models.py         # Application (status, resume)
+│   ├── views.py
+│   └── forms.py
+├── subscriptions/        # Plans & billing
+│   ├── models.py         # SubscriptionPlan, UserSubscription
+│   ├── views.py
+│   └── context_processors.py
+├── templates/
+│   ├── base.html
+│   ├── accounts/         # login, register, profile
+│   ├── jobs/             # index, list, detail, create, edit
+│   ├── applications/     # apply, my_applications, applicants
+│   ├── subscriptions/    # pricing_section, checkout, success, cancel
+│   └── dashboard/        # employer, jobseeker
+├── static/
+│   ├── css/main.css
+│   ├── css/pricing.css
+│   ├── js/main.js
+│   └── js/pricing.js
+├── fixtures/
+│   ├── categories.json
+│   └── plans.json
+├── requirements.txt
+├── .env.example
+└── manage.py
+```
+
+---
+
+## Security Notes
+
+- All sensitive credentials live in `.env` (never commit this file)
+- CSRF protection is enabled on all forms
+- File uploads are validated: PDF only, max 5 MB
+- Role decorators (`@employer_required`, `@jobseeker_required`) protect all sensitive views
+- `@login_required` is applied to all authenticated routes
+
+---
+
+## Honeypot Protection
+
+This project uses **two layers** of honeypot security:
+
+### 1. Form Honeypot — `django-honeypot`
+
+An invisible field named `phonenumber` is injected into every public form (register, login, apply, post job, edit job, profile). Legitimate users never see or fill it. Bots that auto-fill all fields get blocked immediately and see a `400 Bad Request` page (`templates/honeypot/honeypot_error.html`).
+
+**How it works:**
+- `HONEYPOT_FIELD_NAME = 'phonenumber'` in `settings.py` — realistic name fools smarter bots
+- `HoneypotMiddleware` in `MIDDLEWARE` covers all POST responses site-wide
+- `@check_honeypot` decorator on individual views adds a second layer of explicit checking
+- `{% render_honeypot_field %}` in each form template renders the hidden field (hidden via CSS, not `type="hidden"`, so bots can see it but humans can't)
+
+**To change the field name** (recommended before going live):
+```python
+# settings.py
+HONEYPOT_FIELD_NAME = 'your_new_field_name'  # update all templates too
+```
+
+### 2. Admin Honeypot — `django-admin-honeypot`
+
+| URL | Purpose |
+|-----|---------|
+| `/admin/` | **Fake** login page — logs all intrusion attempts |
+| `/secret-admin/` | **Real** Django admin panel |
+
+Any bot or attacker who hits `/admin/` gets a convincing fake login page. Every attempt is logged to the database and visible in the real admin panel under **Admin Honeypot → Login Attempts**.
+
+**Before going live — change the secret admin path:**
+```python
+# jobbhub/urls.py
+path('your-secret-path/', admin.site.urls),  # pick something unguessable
+```
+
+**View login attempts in admin:**
+Go to `/secret-admin/` → Login Attempts section to see all caught bots with IP address, username tried, and timestamp.
+
+---
+
+## Payment Integration (Production)
+
+The checkout view is a placeholder. To go live, integrate one of:
+
+- **MTN Mobile Money Uganda** — MTN MoMo API
+- **Airtel Money Uganda** — Airtel Africa API
+- **Stripe** — for Visa/Mastercard (international)
+- **Flutterwave** — popular pan-African payment gateway
+
+Replace the `checkout_view` POST handler in `subscriptions/views.py` with your payment provider's SDK.
+
+---
+
+## License
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME', default='jobbhub_db'),
+        'USER': config('DB_USER', default='root'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    }
+}
+
+MTN_MOMO_BASE_URL=https://sandbox.momodeveloper.mtn.com
+#MTN_MOMO_SUBSCRIPTION_KEY=75ccd725fd164eb1a3940a92ccf427ae
+#MTN_MOMO_API_USER=93d35bf6-90ee-40a3-855e-e2d9cf04865b
+#MTN_MOMO_API_KEY=3ac5045bf4df43f2870ede210fc9ffa1
+#MTN_MOMO_ENVIRONMENT=sandbox
+#MTN_MOMO_CURRENCY=UGX
+#MTN_MOMO_CALLBACK_URL=https://your-ngrok-url.ngrok.io/subscriptions/mtn/callback/
+
+
+MIT © 2026 JobHub

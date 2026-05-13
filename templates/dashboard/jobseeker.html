@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px;margin:3rem auto;padding:0 2rem;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;margin:0;">My Dashboard</h2>
+      <p style="color:var(--text-muted);margin:0;">Track your job search progress</p>
+    </div>
+    <a href="{% url 'jobs:list' %}" class="btn btn-primary"><i class="bi bi-search me-2"></i>Browse Jobs</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:var(--blue);">{{ total_applications }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Total Applied</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:#E8A020;">{{ pending_count }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Pending</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:#1A7A4A;">{{ accepted_count }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Accepted</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sidebar-card text-center">
+        <div style="font-size:2.2rem;font-weight:700;color:#DC3545;">{{ rejected_count }}</div>
+        <div style="font-size:.875rem;color:var(--text-muted);">Rejected</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Applications table -->
+    <div class="col-lg-8">
+      <div class="sidebar-card p-0">
+        <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+          <h6 style="margin:0;font-weight:600;">Recent Applications</h6>
+          <a href="{% url 'applications:my_applications' %}" style="font-size:.8rem;color:var(--blue);">View all →</a>
+        </div>
+        {% if recent_applications %}
+        <table class="table table-hover mb-0">
+          <thead style="background:var(--surface);">
+            <tr>
+              <th class="ps-4 py-2">Job</th>
+              <th>Company</th>
+              <th>Applied</th>
+              <th class="pe-4">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in recent_applications %}
+            <tr>
+              <td class="ps-4">
+                <a href="{% url 'jobs:detail' app.job.pk %}" style="font-weight:500;font-size:.875rem;color:var(--navy);text-decoration:none;">
+                  {{ app.job.title|truncatechars:30 }}
+                </a>
+              </td>
+              <td style="font-size:.875rem;color:var(--text-muted);">{{ app.job.company_name|truncatechars:20 }}</td>
+              <td style="font-size:.8rem;color:var(--text-muted);">{{ app.applied_at|timesince }} ago</td>
+              <td class="pe-4"><span class="badge {{ app.get_status_badge_class }}">{{ app.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="bi bi-send" style="font-size:2rem;color:var(--text-muted);"></i>
+          <p class="text-muted mt-2 mb-0">You haven't applied for any jobs yet.</p>
+          <a href="{% url 'jobs:list' %}" class="btn btn-sm btn-primary mt-3">Browse Jobs</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sidebar: quick links + plan -->
+    <div class="col-lg-4">
+      <div class="sidebar-card mb-4">
+        <p class="sidebar-title">Quick Actions</p>
+        <div class="d-grid gap-2">
+          <a href="{% url 'jobs:list' %}" class="btn btn-primary btn-sm"><i class="bi bi-search me-2"></i>Browse Jobs</a>
+          <a href="{% url 'applications:my_applications' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-text me-2"></i>All Applications</a>
+          <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-person me-2"></i>Edit Profile</a>
+          <a href="{% url 'subscriptions:pricing' %}" class="btn btn-outline-warning btn-sm"><i class="bi bi-star me-2"></i>Upgrade Plan</a>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <p class="sidebar-title">My Plan</p>
+        {% if user_plan %}
+          <div style="font-size:1.4rem;font-weight:700;color:var(--blue);margin-bottom:.25rem;">{{ user_plan.name }}</div>
+          <p style="font-size:.8rem;color:var(--text-muted);">
+            {% if user_plan.max_applications == -1 %}Unlimited{% else %}{{ user_plan.max_applications }}{% endif %} applications/month
+          </p>
+        {% else %}
+          <div style="font-size:1.4rem;font-weight:700;color:var(--text-muted);margin-bottom:.25rem;">Free</div>
+          <p style="font-size:.8rem;color:var(--text-muted);">5 applications/month</p>
+        {% endif %}
+        <a href="{% url 'subscriptions:pricing' %}" class="btn btn-sm btn-outline-primary w-100">
+          {% if user_plan %}Manage Plan{% else %}Upgrade Now{% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

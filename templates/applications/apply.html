@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Apply — {{ job.title }} — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:720px;margin:3rem auto;padding:0 2rem;">
+  <!-- Job summary banner -->
+  <div class="sidebar-card mb-4" style="background:var(--navy);color:white;border-color:var(--navy);">
+    <div class="d-flex gap-3 align-items-center">
+      <div class="company-logo" style="background:rgba(255,255,255,.12);color:white;width:52px;height:52px;">
+        {{ job.company_name|slice:":2"|upper }}
+      </div>
+      <div>
+        <h5 style="margin:0;color:white;font-family:'Playfair Display',serif;">{{ job.title }}</h5>
+        <p style="margin:0;color:rgba(255,255,255,.6);font-size:.875rem;">{{ job.company_name }} — {{ job.location }}</p>
+      </div>
+      <div class="ms-auto text-end">
+        <span class="badge-type badge-{{ job.job_type|cut:'_' }}">{{ job.get_job_type_display }}</span>
+        {% if job.salary_range %}<br><small style="color:rgba(255,255,255,.6);">{{ job.salary_range }}</small>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-card">
+    <h4 style="font-family:'Playfair Display',serif;margin-bottom:1.5rem;"><i class="bi bi-send me-2" style="color:var(--blue);"></i>Submit Your Application</h4>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% load honeypot %}
+      {% render_honeypot_field %}
+      {{ form|crispy }}
+      <hr class="mt-4">
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary px-5">Submit Application</button>
+        <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

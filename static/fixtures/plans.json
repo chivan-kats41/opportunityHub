@@ -1,0 +1,74 @@
+[
+  {
+    "model": "subscriptions.subscriptionplan", "pk": 1,
+    "fields": {
+      "name": "Free", "slug": "free", "role": "jobseeker",
+      "monthly_usd": "0.00", "yearly_usd": "0.00",
+      "monthly_ugx": 0, "yearly_ugx": 0,
+      "max_applications": 5, "max_job_posts": 0,
+      "is_featured_posts": false, "cv_storage": false,
+      "direct_messaging": false, "analytics": false,
+      "priority_listing": false, "is_active": true, "order": 1
+    }
+  },
+  {
+    "model": "subscriptions.subscriptionplan", "pk": 2,
+    "fields": {
+      "name": "Pro", "slug": "pro", "role": "jobseeker",
+      "monthly_usd": "5.00", "yearly_usd": "48.00",
+      "monthly_ugx": 18500, "yearly_ugx": 178000,
+      "max_applications": 50, "max_job_posts": 0,
+      "is_featured_posts": false, "cv_storage": true,
+      "direct_messaging": true, "analytics": false,
+      "priority_listing": false, "is_active": true, "order": 2
+    }
+  },
+  {
+    "model": "subscriptions.subscriptionplan", "pk": 3,
+    "fields": {
+      "name": "Elite", "slug": "elite", "role": "jobseeker",
+      "monthly_usd": "12.00", "yearly_usd": "115.00",
+      "monthly_ugx": 44500, "yearly_ugx": 427000,
+      "max_applications": -1, "max_job_posts": 0,
+      "is_featured_posts": false, "cv_storage": true,
+      "direct_messaging": true, "analytics": true,
+      "priority_listing": true, "is_active": true, "order": 3
+    }
+  },
+  {
+    "model": "subscriptions.subscriptionplan", "pk": 4,
+    "fields": {
+      "name": "Starter", "slug": "starter", "role": "employer",
+      "monthly_usd": "19.00", "yearly_usd": "182.00",
+      "monthly_ugx": 70000, "yearly_ugx": 672000,
+      "max_applications": 0, "max_job_posts": 3,
+      "is_featured_posts": false, "cv_storage": false,
+      "direct_messaging": false, "analytics": false,
+      "priority_listing": false, "is_active": true, "order": 1
+    }
+  },
+  {
+    "model": "subscriptions.subscriptionplan", "pk": 5,
+    "fields": {
+      "name": "Growth", "slug": "growth", "role": "employer",
+      "monthly_usd": "49.00", "yearly_usd": "470.00",
+      "monthly_ugx": 182000, "yearly_ugx": 1747000,
+      "max_applications": 0, "max_job_posts": 15,
+      "is_featured_posts": true, "cv_storage": true,
+      "direct_messaging": true, "analytics": true,
+      "priority_listing": false, "is_active": true, "order": 2
+    }
+  },
+  {
+    "model": "subscriptions.subscriptionplan", "pk": 6,
+    "fields": {
+      "name": "Enterprise", "slug": "enterprise", "role": "employer",
+      "monthly_usd": "149.00", "yearly_usd": "1430.00",
+      "monthly_ugx": 553000, "yearly_ugx": 5309000,
+      "max_applications": 0, "max_job_posts": -1,
+      "is_featured_posts": true, "cv_storage": true,
+      "direct_messaging": true, "analytics": true,
+      "priority_listing": true, "is_active": true, "order": 3
+    }
+  }
+]

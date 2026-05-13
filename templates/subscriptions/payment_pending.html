@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Waiting for Payment — JobHub{% endblock %}
+
+{% block content %}
+<div style="min-height:60vh;display:flex;align-items:center;justify-content:center;padding:3rem 1rem;">
+  <div class="text-center sidebar-card" style="max-width:480px;width:100%;">
+
+    <!-- Animated spinner -->
+    <div id="pending-icon" style="width:80px;height:80px;background:#FFF8E7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+      <div class="spinner-border" style="color:#E8A020;width:2.5rem;height:2.5rem;" role="status"></div>
+    </div>
+    <div id="success-icon" style="display:none;width:80px;height:80px;background:#E3F5EC;border-radius:50%;display:none;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+      <i class="bi bi-check-circle-fill" style="font-size:2.5rem;color:#1A7A4A;"></i>
+    </div>
+
+    <h4 style="font-family:'Playfair Display',serif;margin-bottom:.5rem;" id="status-title">
+      Waiting for {{ gateway }} Confirmation
+    </h4>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;" id="status-msg">
+      Check your phone and approve the payment prompt. This page will update automatically.
+    </p>
+
+    <!-- Progress steps -->
+    <div class="d-flex justify-content-center gap-3 mb-4" style="font-size:.8rem;color:var(--text-muted);">
+      <div class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Request sent</div>
+      <div>→</div>
+      <div id="step-approve"><i class="bi bi-circle me-1"></i>Approve on phone</div>
+      <div>→</div>
+      <div id="step-confirmed"><i class="bi bi-circle me-1"></i>Confirmed</div>
+    </div>
+
+    <div class="d-flex gap-3 justify-content-center">
+      <button onclick="checkStatus()" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-arrow-clockwise me-1"></i>Check Status
+      </button>
+      <a href="{% url 'subscriptions:pricing' %}" class="btn btn-outline-secondary btn-sm">
+        Cancel
+      </a>
+    </div>
+
+    <p class="mt-3" style="font-size:.75rem;color:var(--text-muted);">
+      Reference: <code>{{ ref }}</code>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const ref     = '{{ ref }}';
+  const gateway = '{{ gateway }}';
+  let   polls   = 0;
+  const MAX_POLLS = 24;   // 2 min at 5s intervals
+
+  // Determine status URL from gateway
+  const statusUrl = gateway.includes('Airtel')
+    ? `/subscriptions/airtel/status/${ref}/`
+    : `/subscriptions/mtn/status/${ref}/`;
+
+  function checkStatus() {
+    if (polls >= MAX_POLLS) {
+      document.getElementById('status-title').textContent = 'Taking longer than expected…';
+      document.getElementById('status-msg').textContent =
+        'Your payment may still be processing. Check your email or contact support.';
+      return;
+    }
+    polls++;
+
+    fetch(statusUrl, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'SUCCESSFUL' || data.status === 'TS') {
+        // Success!
+        document.getElementById('pending-icon').style.display = 'none';
+        document.getElementById('success-icon').style.display = 'flex';
+        document.getElementById('status-title').textContent   = 'Payment Confirmed! 🎉';
+        document.getElementById('status-msg').textContent     = 'Redirecting you to your dashboard…';
+        document.getElementById('step-approve').className     = 'text-success';
+        document.getElementById('step-approve').innerHTML     = '<i class="bi bi-check-circle-fill me-1"></i>Approved';
+        document.getElementById('step-confirmed').className   = 'text-success';
+        document.getElementById('step-confirmed').innerHTML   = '<i class="bi bi-check-circle-fill me-1"></i>Confirmed';
+        setTimeout(() => window.location.href = '/subscriptions/success/', 1500);
+      } else if (data.status === 'FAILED' || data.status === 'TF') {
+        document.getElementById('status-title').textContent = 'Payment Failed';
+        document.getElementById('status-msg').textContent   = 'The payment was declined or timed out. Please try again.';
+      }
+    })
+    .catch(() => {});
+  }
+
+  // Auto-poll every 5 seconds
+  const interval = setInterval(() => {
+    checkStatus();
+    if (polls >= MAX_POLLS) clearInterval(interval);
+  }, 5000);
+</script>
+{% endblock %}

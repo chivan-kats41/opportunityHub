@@ -1,0 +1,222 @@
+{% load static %}
+<!-- ══════════════════════════════════════════════════
+     PRICING SECTION  (id="pricing" for nav anchor)
+══════════════════════════════════════════════════ -->
+<section class="pricing-section" id="pricing">
+  <div class="section-inner">
+
+    <div class="section-eyebrow"><i class="bi bi-shield-check"></i> Membership Plans</div>
+    <h2 class="section-heading">Simple, Transparent Pricing</h2>
+    <p class="section-sub">Choose the plan that fits your goals. Upgrade or cancel anytime — no hidden fees.</p>
+
+    <!-- Controls row -->
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+      <div class="billing-toggle">
+        <button class="billing-btn active" id="btn-monthly" onclick="setBilling('monthly')">Monthly</button>
+        <button class="billing-btn" id="btn-yearly" onclick="setBilling('yearly')">
+          Yearly <span class="save-badge">Save 20%</span>
+        </button>
+      </div>
+      <div class="currency-toggle">
+        <button class="cur-btn active" id="cur-ugx" onclick="setCurrency('ugx')">UGX</button>
+        <button class="cur-btn" id="cur-usd" onclick="setCurrency('usd')">USD</button>
+      </div>
+      <div class="role-tabs" style="margin-bottom:0;">
+        <button class="role-tab active" id="tab-jobseeker" onclick="setRole('jobseeker')">
+          <i class="bi bi-person"></i> Job Seekers
+        </button>
+        <button class="role-tab" id="tab-employer" onclick="setRole('employer')">
+          <i class="bi bi-building"></i> Employers
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── JOB SEEKER PLANS ─────────────────────── -->
+    <div id="plans-jobseeker">
+      <div class="plans-grid">
+
+        <!-- FREE -->
+        <div class="plan-card">
+          <p class="plan-name">Free</p>
+          <div class="plan-price-wrap"><span class="plan-price">0</span></div>
+          <p class="plan-price-sub">No credit card required</p>
+          <p class="plan-ugx">&nbsp;</p>
+          <span class="limit-chip"><i class="bi bi-send"></i> 5 applications / month</span>
+          <p class="plan-desc">Get started for free. Browse jobs and apply to up to 5 positions per month.</p>
+          <hr class="plan-divider"/>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill fi"></i> Browse all job listings</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Apply to 5 jobs / month</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Basic profile page</li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">CV upload &amp; storage</span></li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Profile badge</span></li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Direct messaging</span></li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Application analytics</span></li>
+          </ul>
+          {% if user.is_authenticated %}
+            <a href="{% url 'subscriptions:pricing' %}" class="btn-plan btn-plan-outline">Current Plan</a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}" class="btn-plan btn-plan-outline">Get Started Free</a>
+          {% endif %}
+        </div>
+
+        <!-- PRO -->
+        <div class="plan-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <p class="plan-name">Pro</p>
+          <div class="plan-price-wrap"><span class="plan-price" id="js-pro-price"><sup>$</sup>5</span></div>
+          <p class="plan-price-sub" id="js-pro-cycle">per month, billed monthly</p>
+          <p class="plan-ugx" id="js-pro-ugx">≈ UGX 18,500 / month</p>
+          <span class="yearly-saving" id="js-pro-saving" style="display:none;">Save 20% — pay yearly</span>
+          <span class="limit-chip"><i class="bi bi-send"></i> 50 applications / month</span>
+          <p class="plan-desc">For active job seekers who want to stand out and apply faster.</p>
+          <hr class="plan-divider"/>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill fi"></i> Browse all job listings</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Apply to 50 jobs / month</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> CV upload &amp; cloud storage</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Profile badge <em style="font-size:.75rem;color:var(--text-muted);">(Pro)</em></li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Direct messaging to employers</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Application status tracking</li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Priority listing in searches</span></li>
+          </ul>
+          {% if user.is_authenticated %}
+            <a href="{% url 'subscriptions:checkout' 'pro' %}?cycle=monthly" class="btn-plan btn-plan-primary js-checkout-btn" data-slug="pro">Upgrade to Pro</a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}?plan=pro" class="btn-plan btn-plan-primary">Start Pro Plan</a>
+          {% endif %}
+        </div>
+
+        <!-- ELITE -->
+        <div class="plan-card enterprise">
+          <p class="plan-name">Elite</p>
+          <div class="plan-price-wrap"><span class="plan-price" id="js-elite-price"><sup>$</sup>12</span></div>
+          <p class="plan-price-sub" id="js-elite-cycle">per month, billed monthly</p>
+          <p class="plan-ugx" id="js-elite-ugx">≈ UGX 44,500 / month</p>
+          <span class="yearly-saving" id="js-elite-saving" style="display:none;">Save 20% — pay yearly</span>
+          <span class="limit-chip" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);"><i class="bi bi-send"></i> Unlimited applications</span>
+          <p class="plan-desc">Unlimited access with priority visibility and dedicated career support.</p>
+          <hr class="plan-divider"/>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill fi"></i> Unlimited applications</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> CV upload &amp; cloud storage</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Elite profile badge</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Direct messaging — priority</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Priority in employer searches</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Application analytics dashboard</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Career advisor access</li>
+          </ul>
+          {% if user.is_authenticated %}
+            <a href="{% url 'subscriptions:checkout' 'elite' %}?cycle=monthly" class="btn-plan btn-plan-white js-checkout-btn" data-slug="elite">Upgrade to Elite</a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}?plan=elite" class="btn-plan btn-plan-white">Start Elite Plan</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── EMPLOYER PLANS ────────────────────────── -->
+    <div id="plans-employer" style="display:none;">
+      <div class="plans-grid">
+        <!-- STARTER -->
+        <div class="plan-card">
+          <p class="plan-name">Starter</p>
+          <div class="plan-price-wrap"><span class="plan-price" id="em-starter-price"><sup>$</sup>19</span></div>
+          <p class="plan-price-sub" id="em-starter-cycle">per month, billed monthly</p>
+          <p class="plan-ugx" id="em-starter-ugx">≈ UGX 70,000 / month</p>
+          <span class="yearly-saving" id="em-starter-saving" style="display:none;">Save 20% — pay yearly</span>
+          <span class="limit-chip"><i class="bi bi-briefcase"></i> 3 active job posts</span>
+          <p class="plan-desc">Perfect for small businesses making their first hires on JobHub.</p>
+          <hr class="plan-divider"/>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill fi"></i> 3 active job postings</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> View all applicants</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Basic applicant filtering</li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Featured job posts</span></li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Direct messaging</span></li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">CV database access</span></li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Analytics dashboard</span></li>
+          </ul>
+          {% if user.is_authenticated %}
+            <a href="{% url 'subscriptions:checkout' 'starter' %}?cycle=monthly" class="btn-plan btn-plan-outline js-checkout-btn" data-slug="starter">Upgrade to Starter</a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}?role=employer&plan=starter" class="btn-plan btn-plan-outline">Get Started</a>
+          {% endif %}
+        </div>
+
+        <!-- GROWTH -->
+        <div class="plan-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <p class="plan-name">Growth</p>
+          <div class="plan-price-wrap"><span class="plan-price" id="em-growth-price"><sup>$</sup>49</span></div>
+          <p class="plan-price-sub" id="em-growth-cycle">per month, billed monthly</p>
+          <p class="plan-ugx" id="em-growth-ugx">≈ UGX 182,000 / month</p>
+          <span class="yearly-saving" id="em-growth-saving" style="display:none;">Save 20% — pay yearly</span>
+          <span class="limit-chip"><i class="bi bi-briefcase"></i> 15 active job posts</span>
+          <p class="plan-desc">For growing teams actively recruiting across multiple roles simultaneously.</p>
+          <hr class="plan-divider"/>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill fi"></i> 15 active job postings</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> View &amp; filter all applicants</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> 3 featured job posts / month</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Direct messaging to candidates</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> CV database — 100 views/mo</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Hiring analytics dashboard</li>
+            <li><i class="bi bi-x-circle-fill fx"></i> <span class="ftext-muted">Dedicated account manager</span></li>
+          </ul>
+          {% if user.is_authenticated %}
+            <a href="{% url 'subscriptions:checkout' 'growth' %}?cycle=monthly" class="btn-plan btn-plan-primary js-checkout-btn" data-slug="growth">Upgrade to Growth</a>
+          {% else %}
+            <a href="{% url 'accounts:register' %}?role=employer&plan=growth" class="btn-plan btn-plan-primary">Start Growth Plan</a>
+          {% endif %}
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="plan-card enterprise">
+          <p class="plan-name">Enterprise</p>
+          <div class="plan-price-wrap"><span class="plan-price" id="em-ent-price"><sup>$</sup>149</span></div>
+          <p class="plan-price-sub" id="em-ent-cycle">per month, billed monthly</p>
+          <p class="plan-ugx" id="em-ent-ugx">≈ UGX 553,000 / month</p>
+          <span class="yearly-saving" id="em-ent-saving" style="display:none;">Save 20% — pay yearly</span>
+          <span class="limit-chip" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);"><i class="bi bi-briefcase"></i> Unlimited job posts</span>
+          <p class="plan-desc">Full-scale recruiting infrastructure for large organisations and agencies.</p>
+          <hr class="plan-divider"/>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill fi"></i> Unlimited job postings</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Unlimited featured posts</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Full CV database access</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Direct messaging — unlimited</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Priority placement in search</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Advanced analytics &amp; exports</li>
+            <li><i class="bi bi-check-circle-fill fi"></i> Dedicated account manager</li>
+          </ul>
+          <a href="#" class="btn-plan btn-plan-white">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="pricing-faq">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin:0 0 1.5rem;">Frequently Asked Questions</h3>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>Can I cancel anytime?</h4>
+          <p>Yes. All plans are cancel-anytime with no penalty. Your subscription stays active until the end of the billing period.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What payment methods are accepted?</h4>
+          <p>We accept Mobile Money (MTN &amp; Airtel Uganda), Visa/Mastercard, and bank transfers for enterprise plans.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What happens when my trial ends?</h4>
+          <p>You'll receive a 3-day reminder. You can upgrade or downgrade to the Free plan with no charge.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Is yearly billing worth it?</h4>
+          <p>Yearly plans save 20% compared to paying monthly — billed as a single annual payment.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

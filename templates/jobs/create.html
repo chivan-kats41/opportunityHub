@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Post a Job — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:3rem auto;padding:0 2rem;">
+  <div class="sidebar-card">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div style="width:48px;height:48px;background:#EEF4FF;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-plus-circle" style="font-size:1.3rem;color:#1A6BCC;"></i>
+      </div>
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;margin:0;font-size:1.5rem;">Post a New Job</h2>
+        <p style="color:var(--text-muted);margin:0;font-size:.875rem;">Fill in the details below to list your position</p>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      {% load honeypot %}
+      {% render_honeypot_field %}
+      {{ form|crispy }}
+      <hr class="mt-4">
+      <div class="d-flex gap-3 align-items-center">
+        <button type="submit" class="btn btn-primary px-5 py-2">
+          <i class="bi bi-send me-2"></i>Post Job
+        </button>
+        <a href="{% url 'jobs:my_jobs' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

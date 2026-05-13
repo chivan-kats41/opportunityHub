@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit — {{ job.title }} — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:3rem auto;padding:0 2rem;">
+  <div class="sidebar-card">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div style="width:48px;height:48px;background:#FFF3E0;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-pencil-square" style="font-size:1.3rem;color:#E65100;"></i>
+      </div>
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;margin:0;font-size:1.5rem;">Edit Job</h2>
+        <p style="color:var(--text-muted);margin:0;font-size:.875rem;">{{ job.title }}</p>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      {% load honeypot %}
+      {% render_honeypot_field %}
+      {{ form|crispy }}
+      <hr class="mt-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-3">
+          <button type="submit" class="btn btn-primary px-5 py-2">
+            <i class="bi bi-check-lg me-2"></i>Save Changes
+          </button>
+          <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+        <button type="button" class="btn btn-outline-danger btn-sm"
+                data-bs-toggle="modal" data-bs-target="#deleteModal">
+          <i class="bi bi-trash me-1"></i>Delete Job
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Delete Job</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete <strong>"{{ job.title }}"</strong>?</div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" action="{% url 'jobs:delete' job.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

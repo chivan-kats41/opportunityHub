@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Companies Hiring Now — JobHub{% endblock %}
+
+{% block content %}
+
+<!-- Page header -->
+<div style="background:var(--navy);padding:48px 2rem 40px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="hero-label" style="margin-bottom:1rem;">&#9679; {{ total }}+ companies hiring</div>
+    <h1 style="font-family:'Playfair Display',serif;color:white;font-size:clamp(1.8rem,3vw,2.6rem);margin:0 0 .75rem;">
+      Find Your <em style="font-style:normal;color:var(--accent);">Dream Employer</em>
+    </h1>
+    <p style="color:rgba(255,255,255,.58);font-size:1rem;max-width:460px;margin:0 0 1.75rem;line-height:1.7;">
+      Explore companies actively hiring across Uganda and East Africa.
+    </p>
+    <!-- Search bar -->
+    <form method="get" action="{% url 'jobs:companies' %}">
+      <div class="search-bar" style="max-width:520px;">
+        <div class="search-field">
+          <i class="bi bi-building"></i>
+          <input type="text" name="q" value="{{ q }}" placeholder="Search company name…"/>
+        </div>
+        <button type="submit" class="btn-search"><i class="bi bi-search"></i> Search</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Main content -->
+<div style="max-width:1200px;margin:2.5rem auto;padding:0 2rem;">
+
+  {% if q %}
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:.9rem;">
+    Showing results for <strong style="color:var(--navy);">"{{ q }}"</strong> —
+    <a href="{% url 'jobs:companies' %}" style="color:var(--blue);">clear</a>
+  </p>
+  {% endif %}
+
+  {% if page_obj.object_list %}
+
+  <!-- Companies grid -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;margin-bottom:2rem;">
+    {% for company in page_obj %}
+    <a href="{% url 'jobs:list' %}?q={{ company.company_name|urlencode }}"
+       style="text-decoration:none;color:inherit;">
+      <div class="sidebar-card" style="margin-bottom:0;transition:box-shadow .2s,transform .15s;cursor:pointer;"
+           onmouseover="this.style.boxShadow='0 4px 20px rgba(13,27,42,0.10)';this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.boxShadow='';this.style.transform=''">
+
+        <!-- Company logo / initials -->
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          {% if company.employer__profile_photo %}
+            <img src="/media/{{ company.employer__profile_photo }}"
+                 style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border);">
+          {% else %}
+            <div class="company-logo" style="background:#EEF4FF;color:#1A6BCC;width:52px;height:52px;flex-shrink:0;">
+              {{ company.company_name|slice:":2"|upper }}
+            </div>
+          {% endif %}
+          <div style="min-width:0;">
+            <div style="font-weight:700;font-size:.975rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {{ company.company_name }}
+            </div>
+            {% if company.employer__website %}
+            <div style="font-size:.75rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              <i class="bi bi-globe2 me-1"></i>{{ company.employer__website|cut:"https://"|cut:"http://"|truncatechars:30 }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Open jobs count + last post -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:#E0EDFF;color:var(--blue);
+                       font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:20px;">
+            <i class="bi bi-briefcase"></i>
+            {{ company.open_jobs }} open job{{ company.open_jobs|pluralize }}
+          </span>
+          <span style="font-size:.75rem;color:var(--text-muted);">
+            {{ company.latest_post|timesince }} ago
+          </span>
+        </div>
+
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    {% if page_obj.has_previous %}
+      <a class="page-btn" href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <span class="page-btn active">{{ num }}</span>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a class="page-btn" href="?{% if q %}q={{ q }}&{% endif %}page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <a class="page-btn" href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <!-- Empty state -->
+  <div class="sidebar-card text-center py-5">
+    <i class="bi bi-building" style="font-size:3rem;color:var(--text-muted);"></i>
+    <h5 class="mt-3">No companies found</h5>
+    <p class="text-muted">
+      {% if q %}
+        No companies match "{{ q }}". <a href="{% url 'jobs:companies' %}">Clear search</a>
+      {% else %}
+        No companies have posted jobs yet. Check back soon!
+      {% endif %}
+    </p>
+    <a href="{% url 'jobs:list' %}" class="btn btn-primary mt-2">Browse All Jobs</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

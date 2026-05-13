@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ job.title }} at {{ job.company_name }} — JobHub{% endblock %}
+
+{% block content %}
+<div style="max-width:1200px;margin:0 auto;padding:2rem 2rem;">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'jobs:index' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'jobs:list' %}">Jobs</a></li>
+      <li class="breadcrumb-item active">{{ job.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- MAIN -->
+    <div class="col-lg-8">
+      <div class="sidebar-card mb-4">
+        <!-- Header -->
+        <div class="d-flex gap-3 align-items-start mb-4">
+          <div class="company-logo" style="background:#EEF4FF;color:#1A6BCC;width:64px;height:64px;font-size:1.3rem;">
+            {{ job.company_name|slice:":2"|upper }}
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h1 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin:0;">{{ job.title }}</h1>
+              {% if job.is_featured %}<span class="badge-featured">Featured</span>{% endif %}
+            </div>
+            <p style="color:var(--text-muted);margin:4px 0 0;">{{ job.company_name }} &mdash; {{ job.location }}</p>
+          </div>
+        </div>
+
+        <!-- Meta chips -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <span class="badge-type badge-{{ job.job_type|cut:'_' }} px-3 py-2">{{ job.get_job_type_display }}</span>
+          {% if job.category %}<span class="badge bg-light text-dark border"><i class="bi bi-tag me-1"></i>{{ job.category.name }}</span>{% endif %}
+          {% if job.salary_range %}<span class="badge bg-light text-dark border"><i class="bi bi-currency-dollar me-1"></i>{{ job.salary_range }}</span>{% endif %}
+          {% if job.deadline %}<span class="badge bg-light text-dark border"><i class="bi bi-calendar3 me-1"></i>Deadline: {{ job.deadline|date:"d M Y" }}</span>{% endif %}
+          <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i>Posted {{ job.created_at|timesince }} ago</span>
+        </div>
+
+        <hr>
+
+        <!-- Description -->
+        <h5 class="fw-600 mb-3" style="font-weight:600;">Job Description</h5>
+        <div style="line-height:1.8;color:var(--navy-mid);">{{ job.description|linebreaks }}</div>
+      </div>
+
+      <!-- Employer actions -->
+      {% if user.is_authenticated and user == job.employer %}
+      <div class="sidebar-card">
+        <h6 class="mb-3" style="font-weight:600;"><i class="bi bi-gear me-2"></i>Manage This Job</h6>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil me-1"></i>Edit Job</a>
+          <a href="{% url 'applications:job_applicants' job.pk %}" class="btn btn-outline-success btn-sm"><i class="bi bi-people me-1"></i>View Applicants ({{ job.application_count }})</a>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="bi bi-trash me-1"></i>Delete
+          </button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-4">
+      <!-- Apply card -->
+      <div class="sidebar-card mb-4" style="position:sticky;top:80px;">
+        {% if user.is_authenticated and user.is_jobseeker %}
+          {% if user_applied %}
+            <div class="alert alert-success mb-3"><i class="bi bi-check-circle-fill me-2"></i>You have applied for this job.</div>
+            <a href="{% url 'applications:my_applications' %}" class="btn-plan btn-plan-outline d-block text-center">View My Applications</a>
+          {% else %}
+            <a href="{% url 'applications:apply' job.pk %}" class="btn-plan btn-plan-primary d-block text-center mb-3">
+              <i class="bi bi-send me-2"></i>Apply Now
+            </a>
+            <p class="text-center" style="font-size:.8rem;color:var(--text-muted);">Application deadline: {% if job.deadline %}{{ job.deadline|date:"d M Y" }}{% else %}Open{% endif %}</p>
+          {% endif %}
+        {% elif user.is_authenticated and user.is_employer %}
+          <p class="text-muted text-center">Employers cannot apply for jobs.</p>
+        {% else %}
+          <p class="text-muted text-center mb-3">Sign in to apply for this job.</p>
+          <a href="{% url 'accounts:login' %}?next={% url 'jobs:detail' job.pk %}" class="btn-plan btn-plan-primary d-block text-center mb-2">Sign In to Apply</a>
+          <a href="{% url 'accounts:register' %}" class="btn-plan btn-plan-outline d-block text-center">Create Account</a>
+        {% endif %}
+      </div>
+
+      <!-- Job summary -->
+      <div class="sidebar-card">
+        <p class="sidebar-title">Job Overview</p>
+        <ul class="list-unstyled" style="font-size:.875rem;">
+          <li class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Type</span><strong>{{ job.get_job_type_display }}</strong></li>
+          <li class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Location</span><strong>{{ job.location }}</strong></li>
+          {% if job.salary_range %}<li class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Salary</span><strong>{{ job.salary_range }}</strong></li>{% endif %}
+          {% if job.category %}<li class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Category</span><strong>{{ job.category.name }}</strong></li>{% endif %}
+          <li class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Posted</span><strong>{{ job.created_at|date:"d M Y" }}</strong></li>
+          {% if job.deadline %}<li class="d-flex justify-content-between py-2"><span class="text-muted">Deadline</span><strong>{{ job.deadline|date:"d M Y" }}</strong></li>{% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+{% if user.is_authenticated and user == job.employer %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Delete Job</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete <strong>"{{ job.title }}"</strong>? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" action="{% url 'jobs:delete' job.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete Job</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

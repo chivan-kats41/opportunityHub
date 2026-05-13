@@ -1,0 +1,12 @@
+[
+  {"model": "jobs.category", "pk": 1, "fields": {"name": "Technology",    "slug": "technology"}},
+  {"model": "jobs.category", "pk": 2, "fields": {"name": "Healthcare",    "slug": "healthcare"}},
+  {"model": "jobs.category", "pk": 3, "fields": {"name": "Finance",       "slug": "finance"}},
+  {"model": "jobs.category", "pk": 4, "fields": {"name": "Education",     "slug": "education"}},
+  {"model": "jobs.category", "pk": 5, "fields": {"name": "Marketing",     "slug": "marketing"}},
+  {"model": "jobs.category", "pk": 6, "fields": {"name": "Engineering",   "slug": "engineering"}},
+  {"model": "jobs.category", "pk": 7, "fields": {"name": "Legal",         "slug": "legal"}},
+  {"model": "jobs.category", "pk": 8, "fields": {"name": "NGO / Non-Profit", "slug": "ngo-non-profit"}},
+  {"model": "jobs.category", "pk": 9, "fields": {"name": "Logistics",     "slug": "logistics"}},
+  {"model": "jobs.category", "pk":10, "fields": {"name": "Human Resources","slug": "human-resources"}}
+]

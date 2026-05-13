@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Account — JobHub{% endblock %}
+
+{% block content %}
+<div style="min-height:calc(100vh - 180px);display:flex;align-items:center;background:var(--surface);padding:3rem 1rem;">
+  <div style="max-width:560px;margin:0 auto;width:100%;">
+
+    <div class="text-center mb-4">
+      <h2 style="font-family:'Playfair Display',serif;margin-bottom:.5rem;">Join JobHub</h2>
+      <p style="color:var(--text-muted);">I am a…</p>
+      <div class="role-tabs justify-content-center">
+        <a href="?role=jobseeker" class="role-tab {% if role != 'employer' %}active{% endif %}">
+          <i class="bi bi-person me-1"></i> Job Seeker
+        </a>
+        <a href="?role=employer" class="role-tab {% if role == 'employer' %}active{% endif %}">
+          <i class="bi bi-building me-1"></i> Employer
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <form method="post">
+        {% csrf_token %}
+        {% load honeypot %}
+        {% render_honeypot_field %}
+        <input type="hidden" name="role" value="{{ role }}">
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
+          {% if role == 'employer' %}
+            <i class="bi bi-building me-2"></i>Create Employer Account
+          {% else %}
+            <i class="bi bi-person-plus me-2"></i>Create Account
+          {% endif %}
+        </button>
+      </form>
+      <p class="text-center mt-3" style="font-size:.875rem;color:var(--text-muted);">
+        Already have an account?
+        <a href="{% url 'accounts:login' %}" style="color:var(--blue);font-weight:600;">Sign in</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

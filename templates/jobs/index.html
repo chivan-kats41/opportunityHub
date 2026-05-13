@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}JobHub — Find Your Next Opportunity{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/pricing.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══ HERO ════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">&#9679; 1,240 new jobs posted this week</div>
+    <h1>Find Your Next <em>Career</em><br>Opportunity</h1>
+    <p>Connect with top employers across Uganda and East Africa. Your next great role is waiting.</p>
+    <form action="{% url 'jobs:list' %}" method="get">
+      <div class="search-bar">
+        <div class="search-field">
+          <i class="bi bi-search"></i>
+          <input type="text" name="q" placeholder="Job title, keyword, or company"/>
+        </div>
+        <div class="search-field">
+          <i class="bi bi-geo-alt"></i>
+          <input type="text" name="location" placeholder="Location (e.g. Kampala)"/>
+        </div>
+        <div class="search-field">
+          <i class="bi bi-briefcase"></i>
+          <select name="category">
+            <option value="">All categories</option>
+            {% for cat in categories %}
+              <option value="{{ cat.pk }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn-search"><i class="bi bi-search"></i> Search Jobs</button>
+      </div>
+    </form>
+    <div class="hero-stats">
+      <div class="stat-item"><strong>24,800+</strong> Active jobs</div>
+      <div class="stat-item"><strong>3,500+</strong> Companies</div>
+      <div class="stat-item"><strong>180K+</strong> Job seekers</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FILTER TABS ══════════════════════════════════ -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <a class="filter-tab active" href="{% url 'jobs:list' %}">All Jobs</a>
+    <a class="filter-tab" href="{% url 'jobs:list' %}?job_type=full_time">Full-time</a>
+    <a class="filter-tab" href="{% url 'jobs:list' %}?job_type=remote">Remote</a>
+    <a class="filter-tab" href="{% url 'jobs:list' %}?job_type=part_time">Part-time</a>
+    <a class="filter-tab" href="{% url 'jobs:list' %}?job_type=contract">Contract</a>
+    <a class="filter-tab" href="{% url 'jobs:list' %}?job_type=internship">Internship</a>
+  </div>
+</div>
+
+<!-- ══ FEATURED JOBS ════════════════════════════════ -->
+<div class="main-content">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <p class="sidebar-title">Job Type</p>
+      <label class="filter-label"><input type="checkbox" checked> Full-time</label>
+      <label class="filter-label"><input type="checkbox"> Part-time</label>
+      <label class="filter-label"><input type="checkbox"> Remote</label>
+      <label class="filter-label"><input type="checkbox"> Contract</label>
+      <label class="filter-label"><input type="checkbox"> Internship</label>
+    </div>
+    <div class="sidebar-card">
+      <p class="sidebar-title">Salary Range (UGX / month)</p>
+      <input type="range" class="salary-range" min="500000" max="20000000" value="5000000"/>
+      <div class="salary-display"><span>UGX 500K</span><span id="salary-val">UGX 5M</span></div>
+    </div>
+    <div class="sidebar-card">
+      <p class="sidebar-title">Category</p>
+      {% for cat in categories %}
+        <label class="filter-label">
+          <input type="checkbox"> {{ cat.name }}
+        </label>
+      {% endfor %}
+      <a href="{% url 'jobs:list' %}" class="btn-apply-filter d-block text-center mt-2">Browse All Jobs</a>
+    </div>
+  </aside>
+
+  <main>
+    <div class="listings-header">
+      <p class="listings-title">
+        {% if featured_jobs %}
+          Showing <strong>featured</strong> opportunities
+        {% else %}
+          No featured jobs at the moment — <a href="{% url 'jobs:list' %}">browse all jobs</a>
+        {% endif %}
+      </p>
+      <a href="{% url 'jobs:list' %}" class="sort-select" style="text-decoration:none;padding:8px 16px;background:var(--navy);color:#fff;border-radius:7px;font-size:.85rem;font-weight:600;">View All Jobs →</a>
+    </div>
+
+    {% for job in featured_jobs %}
+    <a class="job-card {% if job.is_featured %}featured{% endif %}" href="{% url 'jobs:detail' job.pk %}">
+      <div class="company-logo" style="background:#EEF4FF;color:#1A6BCC;">
+        {{ job.company_name|slice:":2"|upper }}
+      </div>
+      <div class="job-body">
+        <div class="job-top">
+          <div>
+            <p class="job-title">{{ job.title }}</p>
+            <p class="job-company">{{ job.company_name }} &mdash; {{ job.location }}</p>
+          </div>
+          {% if job.is_featured %}<span class="badge-featured">Featured</span>{% endif %}
+        </div>
+        <div class="job-meta">
+          <span class="badge-type badge-{{ job.job_type|cut:'_' }}">{{ job.get_job_type_display }}</span>
+          <span><i class="bi bi-geo-alt"></i>{{ job.location }}</span>
+          {% if job.category %}<span><i class="bi bi-tag"></i>{{ job.category.name }}</span>{% endif %}
+          {% if job.deadline %}<span><i class="bi bi-calendar3"></i>Deadline: {{ job.deadline|date:"d M Y" }}</span>{% endif %}
+        </div>
+      </div>
+      <div class="job-right">
+        {% if job.salary_range %}<div class="job-salary">{{ job.salary_range }}</div>{% endif %}
+        <div class="job-posted">{{ job.created_at|timesince }} ago</div>
+        <button class="btn-save" onclick="event.preventDefault()"><i class="bi bi-bookmark"></i></button>
+      </div>
+    </a>
+    {% empty %}
+    <div class="text-center py-5">
+      <i class="bi bi-briefcase" style="font-size:3rem;color:var(--text-muted);"></i>
+      <p class="mt-3 text-muted">No jobs posted yet. Check back soon!</p>
+      {% if user.is_authenticated and user.is_employer %}
+        <a href="{% url 'jobs:create' %}" class="btn btn-primary mt-2">Post First Job</a>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if featured_jobs %}
+    <div class="text-center mt-4">
+      <a href="{% url 'jobs:list' %}" class="btn btn-outline-primary btn-lg px-5">
+        Browse All Jobs <i class="bi bi-arrow-right ms-2"></i>
+      </a>
+    </div>
+    {% endif %}
+  </main>
+</div>
+
+<!-- ══ PRICING SECTION ══════════════════════════════ -->
+{% include 'subscriptions/pricing_section.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pricing.js' %}"></script>
+{% endblock %}

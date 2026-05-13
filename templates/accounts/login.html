@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In — JobHub{% endblock %}
+
+{% block content %}
+<div style="min-height:calc(100vh - 180px);display:flex;align-items:center;background:var(--surface);padding:3rem 1rem;">
+  <div style="max-width:440px;margin:0 auto;width:100%;">
+    <div class="text-center mb-4">
+      <h2 style="font-family:'Playfair Display',serif;margin-bottom:.25rem;">Welcome Back</h2>
+      <p style="color:var(--text-muted);">Sign in to your JobHub account</p>
+    </div>
+
+    <div class="sidebar-card">
+      <form method="post">
+        {% csrf_token %}
+        {% load honeypot %}
+        {% render_honeypot_field %}
+        <div class="mb-3">
+          <label class="form-label fw-500" for="username">Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-person text-muted"></i></span>
+            <input type="text" name="username" id="username" class="form-control" placeholder="Your username" required autofocus>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-500" for="password">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-lock text-muted"></i></span>
+            <input type="password" name="password" id="password" class="form-control" placeholder="Your password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </button>
+      </form>
+
+      <hr class="my-4">
+      <p class="text-center mb-0" style="font-size:.875rem;color:var(--text-muted);">
+        Don't have an account?
+        <a href="{% url 'accounts:register' %}" style="color:var(--blue);font-weight:600;">Create one free</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
