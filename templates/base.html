@@ -44,6 +44,151 @@ body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(
   display: inline-flex; align-items: center; justify-content: center;
 }
 
+/* ── HAMBURGER BUTTON ────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: border-color .2s;
+}
+.hamburger:hover { border-color: var(--blue); }
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--navy);
+  border-radius: 2px;
+  transition: transform .3s ease, opacity .3s ease, width .3s ease;
+  transform-origin: center;
+}
+/* Animate to X when open */
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── MOBILE MENU OVERLAY ─────────────────────── */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 27, 42, 0.45);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.mobile-overlay.visible { opacity: 1; }
+
+/* ── MOBILE DRAWER ───────────────────────────── */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(300px, 85vw);
+  height: 100dvh;
+  background: var(--white);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.4,0,.2,1);
+  box-shadow: -8px 0 40px rgba(13,27,42,0.15);
+  overflow-y: auto;
+}
+.mobile-menu.open { transform: translateX(0); }
+
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  height: 64px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.mobile-menu-close {
+  width: 36px; height: 36px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--navy-mid); font-size: 1rem;
+  transition: all .2s;
+}
+.mobile-menu-close:hover { border-color: var(--blue); color: var(--blue); }
+
+.mobile-nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 1rem 0;
+  flex: 1;
+}
+.mobile-nav-links li { border-bottom: 1px solid var(--surface); }
+.mobile-nav-links li:last-child { border-bottom: none; }
+.mobile-nav-links a,
+.mobile-nav-links button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: var(--navy-mid);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  text-align: left;
+}
+.mobile-nav-links a:hover,
+.mobile-nav-links button:hover { background: var(--surface); color: var(--blue); }
+.mobile-nav-links .mobile-btn-post {
+  margin: 0.75rem 1.25rem;
+  background: var(--blue);
+  color: var(--white) !important;
+  border-radius: 7px;
+  justify-content: center;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+}
+.mobile-nav-links .mobile-btn-post:hover { background: var(--blue-light) !important; }
+.mobile-nav-links .mobile-btn-outline {
+  margin: 0 1.25rem 0.5rem;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 7px;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--navy) !important;
+  padding: 0.65rem 1rem;
+}
+.mobile-nav-links li.mobile-divider { height: 1px; background: var(--border); margin: 0.5rem 0; border: none; }
+.mobile-nav-links .mobile-danger { color: #DC2626 !important; }
+.mobile-nav-links .mobile-danger:hover { background: #FEF2F2 !important; color: #DC2626 !important; }
+/* User info strip at top of mobile menu */
+.mobile-user-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.mobile-user-strip .mobile-user-name { font-size: 0.875rem; font-weight: 600; color: var(--navy); }
+.mobile-user-strip .mobile-user-role { font-size: 0.75rem; color: var(--text-muted); }
+
 /* ── HERO ────────────────────────────────────── */
 .hero { background: var(--navy); padding: 80px 2rem 72px; position: relative; overflow: hidden; }
 .hero::before { content: ''; position: absolute; top: -120px; right: -120px; width: 480px; height: 480px; background: radial-gradient(circle, rgba(26,107,204,0.25) 0%, transparent 70%); border-radius: 50%; }
@@ -145,6 +290,8 @@ footer { background: var(--navy); color: rgba(255,255,255,0.55); margin-top: 0; 
   .nav-links { display: none; }
   .footer-grid { grid-template-columns: 1fr; }
   .job-right { display: none; }
+  /* Show hamburger on mobile */
+  .hamburger { display: flex; }
 }
 
 /* ── ROLE TABS (auth pages) ──────────────────── */
@@ -315,6 +462,8 @@ footer { background: var(--navy); color: rgba(255,255,255,0.55); margin-top: 0; 
 <nav class="navbar">
   <div class="navbar-inner">
     <a href="{% url 'jobs:index' %}" class="logo">Job<span>Hub</span></a>
+
+    <!-- Desktop nav (hidden on mobile via existing CSS) -->
     <ul class="nav-links">
       <li><a href="{% url 'jobs:list' %}">Browse Jobs</a></li>
       {% if user.is_authenticated %}
@@ -352,8 +501,89 @@ footer { background: var(--navy); color: rgba(255,255,255,0.55); margin-top: 0; 
         <li><a href="{% url 'accounts:register' %}" class="btn-post">Get Started</a></li>
       {% endif %}
     </ul>
+
+    <!-- Hamburger button (visible on mobile only) -->
+    <button class="hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </nav>
+
+<!-- ══ MOBILE OVERLAY ══════════════════════════════ -->
+<div class="mobile-overlay" id="mobile-overlay"></div>
+
+<!-- ══ MOBILE DRAWER ═══════════════════════════════ -->
+<div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+
+  <div class="mobile-menu-header">
+    <a href="{% url 'jobs:index' %}" class="logo">Job<span>Hub</span></a>
+    <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  {% if user.is_authenticated %}
+  <!-- User info strip -->
+  <div class="mobile-user-strip">
+    {% if user.profile_photo %}
+      <img src="{{ user.profile_photo.url }}" class="rounded-circle" width="36" height="36" style="object-fit:cover;flex-shrink:0;">
+    {% else %}
+      <span class="avatar-initials" style="width:36px;height:36px;font-size:.8rem;flex-shrink:0;">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+    {% endif %}
+    <div>
+      <div class="mobile-user-name">{{ user.get_short_name }}</div>
+      <div class="mobile-user-role">{% if user.is_employer %}Employer{% else %}Job Seeker{% endif %}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <ul class="mobile-nav-links">
+    <li><a href="{% url 'jobs:list' %}"><i class="bi bi-briefcase"></i> Browse Jobs</a></li>
+
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'dashboard:index' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+      <li><a href="{% url 'accounts:profile' %}"><i class="bi bi-person"></i> Profile</a></li>
+      <li><a href="{% url 'subscriptions:pricing' %}"><i class="bi bi-star"></i> Upgrade Plan</a></li>
+      {% if user.is_employer %}
+        <li><a href="{% url 'dashboard:employer' %}"><i class="bi bi-bar-chart"></i> Employer Dashboard</a></li>
+      {% else %}
+        <li><a href="{% url 'applications:my_applications' %}"><i class="bi bi-file-earmark-text"></i> My Applications</a></li>
+      {% endif %}
+      {% if user.is_staff %}
+        <li><a href="/secret-admin/"><i class="bi bi-shield-lock"></i> Admin Panel</a></li>
+      {% endif %}
+      {% if user.is_employer %}
+        <li>
+          <a href="{% url 'jobs:create' %}" class="mobile-btn-post">
+            <i class="bi bi-plus-lg"></i> Post a Job
+          </a>
+        </li>
+      {% endif %}
+      <li class="mobile-divider"></li>
+      <li>
+        <form method="post" action="{% url 'accounts:logout' %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="mobile-danger"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+        </form>
+      </li>
+    {% else %}
+      <li><a href="{% url 'subscriptions:pricing' %}"><i class="bi bi-tag"></i> Pricing</a></li>
+      <li class="mobile-divider"></li>
+      <li>
+        <a href="{% url 'accounts:login' %}" class="mobile-btn-outline">
+          Sign In
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'accounts:register' %}" class="mobile-btn-post">
+          Get Started
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</div>
 
 <!-- ══ FLASH MESSAGES ══════════════════════════════ -->
 {% if messages %}
@@ -492,6 +722,52 @@ footer { background: var(--navy); color: rgba(255,255,255,0.55); margin-top: 0; 
     if(pem)pem.style.display=r==='employer'?'':'none';
   }
   document.addEventListener('DOMContentLoaded',updatePrices);
+
+  /* ══ HAMBURGER MENU ══════════════════════════════ */
+  (function () {
+    const btn      = document.getElementById('hamburger-btn');
+    const menu     = document.getElementById('mobile-menu');
+    const overlay  = document.getElementById('mobile-overlay');
+    const closeBtn = document.getElementById('mobile-menu-close');
+
+    function openMenu() {
+      menu.classList.add('open');
+      overlay.style.display = 'block';
+      // Trigger reflow so transition plays
+      overlay.offsetHeight;
+      overlay.classList.add('visible');
+      btn.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      menu.classList.remove('open');
+      overlay.classList.remove('visible');
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      // Hide overlay after transition
+      overlay.addEventListener('transitionend', function hide() {
+        overlay.style.display = 'none';
+        overlay.removeEventListener('transitionend', hide);
+      });
+    }
+
+    btn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Close on Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menu.classList.contains('open')) closeMenu();
+    });
+
+    // Close menu if window is resized to desktop width
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 680 && menu.classList.contains('open')) closeMenu();
+    });
+  })();
 </script>
 {% block extra_js %}{% endblock %}
 </body>
